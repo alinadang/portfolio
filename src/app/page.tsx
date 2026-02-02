@@ -122,6 +122,12 @@ export default function Home() {
               private: true,
             },
             {
+              title: "Mini Amazon",
+              desc: "A full-stack e-commerce-style application inspired by Amazon. Implements product listings, user interactions, and backend logic with a focus on scalability and clean architecture.",
+              link: "https://github.com/alinadang/mini-amazon",
+              private: false,
+            },
+            {
               title: "Portfolio Website",
               desc: "The site you’re looking at right now — built with Next.js and Tailwind CSS, deployed on Vercel.",
               link: "https://github.com/alinadang/portfolio",
