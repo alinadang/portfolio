@@ -1,10 +1,17 @@
 "use client";
-import { useState, useEffect } from "react";
-import { FaLinkedin, FaGithub } from "react-icons/fa";
+import { useState, useEffect, useRef } from "react";
+import { FaLinkedin, FaGithub, FaEnvelope } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("home");
+
+  // contact popouts state (hero + footer)
+  const [heroContactOpen, setHeroContactOpen] = useState(false);
+  const [footerContactOpen, setFooterContactOpen] = useState(false);
+
+  const heroContactRef = useRef<HTMLDivElement | null>(null);
+  const footerContactRef = useRef<HTMLDivElement | null>(null);
 
   // scroll spy for active section
   useEffect(() => {
@@ -29,6 +36,21 @@ export default function Home() {
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // helper: close popout only if focus left the wrapper
+  const handleBlurChecker =
+    (ref: React.RefObject<HTMLElement>, setter: (v: boolean) => void) =>
+    () => {
+      // small timeout to allow focus to move to a menu item inside the wrapper
+      setTimeout(() => {
+        if (!ref.current) {
+          setter(false);
+          return;
+        }
+        const active = document.activeElement;
+        if (!ref.current.contains(active)) setter(false);
+      }, 100);
+    };
 
   return (
     <main className="flex flex-col min-h-screen scroll-smooth bg-gradient-to-b from-gray-900 via-black to-gray-900 text-gray-100">
@@ -82,25 +104,103 @@ export default function Home() {
         <h1 className="text-6xl font-extrabold tracking-tight mb-6">
           Hi, I’m <span className="text-blue-400">Alina</span>
         </h1>
-        <p className="text-xl text-gray-300 leading-relaxed mb-10">
+        <p className="text-xl text-gray-300 leading-relaxed mb-6">
           I’m a second-year student at Duke University studying{" "}
           <span className="text-blue-400 font-medium">Computer Science</span>{" "}
           and <span className="text-blue-400 font-medium">Economics</span>. I am
-          passionate about building full-stack applications and solving
-          real-world problems using modern, scalable solutions.
+          passionate about building full-stack applications,{" "}
+          <span className="text-blue-400 font-medium">product-driven experiences</span>,
+          and solving real-world problems using modern, scalable solutions.
         </p>
-        <div className="flex gap-6 justify-center">
+
+        {/* Open-to Roles — static badges */}
+        <div className="mt-4 flex flex-wrap justify-center gap-3">
+          <span className="px-5 py-2 rounded-full bg-white/6 text-white/90 border border-white/8 text-sm shadow-sm">
+            Software Engineering
+          </span>
+
+          <span className="px-5 py-2 rounded-full bg-white/6 text-white/90 border border-white/8 text-sm shadow-sm">
+            Product Management
+          </span>
+        </div>
+
+        {/* Top action group: Contact (with popout) / GitHub / LinkedIn */}
+        <div className="mt-6 flex flex-col items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Contact - bordered style to match GitHub/LinkedIn */}
+            <div
+              ref={heroContactRef}
+              className="relative"
+              onMouseEnter={() => setHeroContactOpen(true)}
+              onMouseLeave={() => setHeroContactOpen(false)}
+              onBlur={handleBlurChecker(heroContactRef, setHeroContactOpen)}
+            >
+              <button
+                onFocus={() => setHeroContactOpen(true)}
+                aria-haspopup="menu"
+                aria-expanded={heroContactOpen}
+                className="inline-flex items-center gap-3 px-6 py-3 rounded-lg border border-gray-700 bg-transparent text-white/90 hover:bg-white/3 transition focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+              >
+                <FaEnvelope size={18} />
+                <span>Contact Me</span>
+              </button>
+
+              {/* Popout menu */}
+              <div
+                role="menu"
+                aria-label="Contact emails"
+                className={`absolute left-1/2 transform -translate-x-1/2 mt-3 w-64 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-2 z-40 transition-opacity ${
+                  heroContactOpen ? "opacity-100 visible" : "opacity-0 invisible"
+                }`}
+              >
+                <a
+                  href="mailto:alinadang06@gmail.com"
+                  className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white"
+                  role="menuitem"
+                >
+                  Primary: alinadang06@gmail.com
+                </a>
+                <a
+                  href="mailto:ad621@duke.edu"
+                  className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white"
+                  role="menuitem"
+                >
+                  Secondary: ad621@duke.edu
+                </a>
+              </div>
+            </div>
+
+            {/* GitHub */}
+            <a
+              href="https://github.com/alinadang"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 px-6 py-3 rounded-lg border border-gray-700 bg-transparent text-white/90 hover:bg-white/3 transition"
+              aria-label="GitHub"
+            >
+              <FaGithub size={18} />
+              <span>GitHub</span>
+            </a>
+
+            {/* LinkedIn */}
+            <a
+              href="https://www.linkedin.com/in/alina-dang-8358692a6/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 px-6 py-3 rounded-lg border border-gray-700 bg-transparent text-white/90 hover:bg-white/3 transition"
+              aria-label="LinkedIn"
+            >
+              <FaLinkedin size={18} />
+              <span>LinkedIn</span>
+            </a>
+          </div>
+
+          {/* Moved: View Projects (subtle, below the buttons) */}
           <a
             href="#projects"
-            className="px-8 py-3 rounded-xl bg-blue-500 text-white font-medium shadow-lg hover:bg-blue-600 transition"
+            className="text-sm text-gray-300 hover:text-blue-400 underline"
           >
             View Projects
-          </a>
-          <a
-            href="#contact"
-            className="px-8 py-3 rounded-xl border border-gray-700 bg-gray-800 font-medium hover:bg-gray-700 transition"
-          >
-            Contact Me
           </a>
         </div>
       </motion.section>
@@ -118,6 +218,7 @@ export default function Home() {
             {
               title: "Predicting Student Decisions (Internship)",
               desc: "Developed during my Data+ 2025 Summer Internship. Built machine learning models to predict student decision outcomes using demographic and behavioral data. Focused on model accuracy, interpretability, and actionable insights.",
+              poster: "/predicting-student-decisions-poster.pdf",
               link: "https://github.com/Data-2025-Summer-Project/Predicting_Student_Decisions",
               private: true,
             },
@@ -125,6 +226,12 @@ export default function Home() {
               title: "Mini Amazon",
               desc: "A full-stack e-commerce-style application inspired by Amazon. Implements product listings, user interactions, and backend logic with a focus on scalability and clean architecture.",
               link: "https://github.com/alinadang/mini-amazon",
+              private: false,
+            },
+            {
+              title: "Email Style Rewriter",
+              desc: "A chrome extension that rewrites emails in different tones and styles using AI. Designed to help users quickly refine professional, casual, or persuasive communication.",
+              link: "https://github.com/alinadang/email-style-rewriter",
               private: false,
             },
             {
@@ -144,16 +251,29 @@ export default function Home() {
             >
               <h3 className="text-2xl font-semibold mb-3">{proj.title}</h3>
               <p className="text-gray-400 mb-4">{proj.desc}</p>
-              <a
-                href={proj.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 font-medium hover:underline"
-              >
-                {proj.private
-                  ? "GitHub (Private Repository)"
-                  : "View on GitHub →"}
-              </a>
+              <div className="flex flex-col gap-2">
+                <a
+                  href={proj.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 font-medium hover:underline"
+                >
+                  {proj.private
+                    ? "GitHub (Private Repository)"
+                    : "View on GitHub →"}
+                </a>
+
+                {proj.poster && (
+                  <a
+                    href={proj.poster}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-gray-300 hover:text-blue-400 underline"
+                  >
+                    View Project Poster (PDF)
+                  </a>
+                )}
+              </div>
             </motion.div>
           ))}
         </div>
@@ -188,23 +308,67 @@ export default function Home() {
           </a>
         </p>
 
-        {/* Social Links */}
-        <div className="flex justify-center gap-6 mt-4 text-lg">
-          <a
-            href="https://www.linkedin.com/in/alina-dang-8358692a6/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-500 transition"
+        {/* Footer Buttons (Contact with popout + GitHub + LinkedIn) */}
+        <div className="flex justify-center gap-4 mt-4">
+          <div
+            ref={footerContactRef}
+            className="relative"
+            onMouseEnter={() => setFooterContactOpen(true)}
+            onMouseLeave={() => setFooterContactOpen(false)}
+            onBlur={handleBlurChecker(footerContactRef, setFooterContactOpen)}
           >
-            <FaLinkedin size={28} />
-          </a>
+            <button
+              onFocus={() => setFooterContactOpen(true)}
+              aria-haspopup="menu"
+              aria-expanded={footerContactOpen}
+              className="inline-flex items-center gap-3 px-5 py-3 rounded-lg border border-gray-700 bg-transparent text-white/90 hover:bg-white/3 transition focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+            >
+              <FaEnvelope size={18} />
+              <span>Contact Me</span>
+            </button>
+
+            <div
+              role="menu"
+              aria-label="Contact emails"
+              className={`absolute left-1/2 transform -translate-x-1/2 mt-3 w-64 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-2 z-40 transition-opacity ${
+                footerContactOpen ? "opacity-100 visible" : "opacity-0 invisible"
+              }`}
+            >
+              <a
+                href="mailto:alinadang06@gmail.com"
+                className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white"
+                role="menuitem"
+              >
+                Primary: alinadang06@gmail.com
+              </a>
+              <a
+                href="mailto:ad621@duke.edu"
+                className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white"
+                role="menuitem"
+              >
+                Secondary: ad621@duke.edu
+              </a>
+            </div>
+          </div>
+
           <a
             href="https://github.com/alinadang"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-500 transition"
+            className="inline-flex items-center gap-3 px-5 py-3 rounded-lg border border-gray-700 bg-transparent text-white/90 hover:bg-white/3 transition"
           >
-            <FaGithub size={28} />
+            <FaGithub size={18} />
+            <span>GitHub</span>
+          </a>
+
+          <a
+            href="https://www.linkedin.com/in/alina-dang-8358692a6/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-5 py-3 rounded-lg border border-gray-700 bg-transparent text-white/90 hover:bg-white/3 transition"
+          >
+            <FaLinkedin size={18} />
+            <span>LinkedIn</span>
           </a>
         </div>
       </motion.footer>
