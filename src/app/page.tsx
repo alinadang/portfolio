@@ -10,6 +10,7 @@ export default function Home() {
   const [heroContactOpen, setHeroContactOpen] = useState(false);
   const [footerContactOpen, setFooterContactOpen] = useState(false);
 
+  // use HTMLDivElement | null consistently for refs
   const heroContactRef = useRef<HTMLDivElement | null>(null);
   const footerContactRef = useRef<HTMLDivElement | null>(null);
 
@@ -38,8 +39,9 @@ export default function Home() {
   }, []);
 
   // helper: close popout only if focus left the wrapper
+  // typed to accept the same RefObject<HTMLDivElement | null> used above
   const handleBlurChecker =
-    (ref: React.RefObject<HTMLElement>, setter: (v: boolean) => void) =>
+    (ref: React.RefObject<HTMLDivElement | null>, setter: (v: boolean) => void) =>
     () => {
       // small timeout to allow focus to move to a menu item inside the wrapper
       setTimeout(() => {
